@@ -1,11 +1,9 @@
 # Subspace.money — Product Teardown
-### Product Intern Assignment · Yash Vardhan Malik · May 2026
-
----
-
-## Overview
-
-A hands-on product teardown of [Subspace.money](https://subspace.money) — India's subscription sharing & savings marketplace. This submission includes a full written report and **5 interactive UI mockups** showing proposed fixes.
+ 
+### Yash Vardhan Malik · Product Intern Assignment · May 2026
+ 
+🌐 **Live site:** https://yash600.github.io/SubSpace/
+📄 **Report:** [Download PDF](SUBSPA~2.pdf)
 
 ---
 
