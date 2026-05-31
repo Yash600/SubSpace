@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subspace — Dashboard Redesign (Proposed)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#09090f;color:#f1f0ff;min-height:100vh}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;background:#0f0e1a;border-bottom:1px solid #1e1b3a;position:sticky;top:0;z-index:10}
+  .logo{font-size:22px;font-weight:800;color:#fff}.logo span{color:#a78bfa}
+  .nav-tabs{display:flex;gap:4px}
+  .nav-tab{padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;color:#9ca3af;transition:.2s}
+  .nav-tab:hover{color:#fff;background:#1e1b3a}
+  .nav-tab.active{color:#fff;background:#7c3aed}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:#1e1b3a;border:1px solid #7c3aed;border-radius:20px;padding:4px 14px;font-size:12px;color:#a78bfa;margin-bottom:24px}
+  .page{padding:32px;max-width:1100px;margin:0 auto}
+  h1{font-size:28px;font-weight:700;margin-bottom:8px}
+  .sub{color:#9ca3af;font-size:14px;margin-bottom:40px}
+  .section-title{font-size:17px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px;color:#e5e7eb}
+  .section-title::after{content:'';flex:1;height:1px;background:#1e1b3a}
+  /* DASHBOARD LAYOUT */
+  .dash{background:#0f0e1a;border:2px solid #7c3aed;border-radius:16px;overflow:hidden}
+  .dash-nav{background:#13112a;border-bottom:1px solid #1e1b3a;padding:0 20px;display:flex;align-items:center;gap:4px}
+  .dash-tab{padding:12px 16px;font-size:13px;color:#9ca3af;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .dash-tab.active{color:#a78bfa;border-bottom-color:#7c3aed;font-weight:600}
+  .dash-body{padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  /* SAVINGS HERO */
+  .savings-hero{grid-column:1/-1;background:linear-gradient(135deg,#2d1f6e,#1e3a5f);border-radius:14px;padding:24px;display:flex;align-items:center;justify-content:space-between;border:1px solid #3b2e7a}
+  .savings-left{}
+  .savings-label{font-size:12px;color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+  .savings-amount{font-size:42px;font-weight:800;color:#fff;margin-bottom:4px}
+  .savings-sub{font-size:13px;color:#9ca3af}
+  .savings-cards{display:flex;gap:12px}
+  .sav-card{background:rgba(255,255,255,.08);border-radius:10px;padding:12px 16px;text-align:center;min-width:90px}
+  .sav-card-val{font-size:18px;font-weight:700;color:#22c55e}
+  .sav-card-label{font-size:11px;color:#9ca3af;margin-top:2px}
+  /* MINI GRAPH */
+  .mini-graph{height:48px;display:flex;align-items:flex-end;gap:4px;margin-top:12px}
+  .bar{background:#7c3aed;border-radius:3px 3px 0 0;flex:1;opacity:.7;transition:.3s}
+  .bar:last-child{opacity:1}
+  /* QUICK ACTIONS */
+  .quick-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+  .qa-btn{display:flex;align-items:center;gap:8px;background:#13112a;border:1px solid #3b2e7a;border-radius:10px;padding:10px 16px;font-size:13px;cursor:pointer;transition:.2s;color:#d1d5db}
+  .qa-btn:hover{border-color:#7c3aed;color:#a78bfa}
+  /* SUBSCRIPTION CARDS */
+  .sub-card{background:#13112a;border:1px solid #1e1b3a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+  .sub-card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .sub-card-info{flex:1}
+  .sub-card-name{font-size:14px;font-weight:600}
+  .sub-card-detail{font-size:12px;color:#9ca3af;margin-top:2px}
+  .sub-card-price{text-align:right}
+  .sub-card-amount{font-size:15px;font-weight:700;color:#a78bfa}
+  .sub-card-save{font-size:11px;color:#22c55e;margin-top:2px}
+  /* RECOMMENDED */
+  .rec-card{background:#13112a;border:1px solid #3b2e7a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+  .btn-join{background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer}
+  /* SAVINGS POTENTIAL BANNER */
+  .potential-banner{grid-column:1/-1;background:#0a1a0f;border:1px solid #166534;border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+  .pot-left{display:flex;align-items:center;gap:12px}
+  .pot-icon{font-size:24px}
+  .pot-title{font-size:14px;font-weight:600;color:#86efac}
+  .pot-sub{font-size:12px;color:#4ade80;margin-top:2px}
+  .btn-pot{background:#166534;color:#86efac;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer}
+  /* BA */
+  .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px}
+  .ba-card{border-radius:16px;overflow:hidden;border:1px solid #1e1b3a}
+  .ba-header{padding:12px 20px;font-size:12px;font-weight:700;letter-spacing:.08em}
+  .before-h{background:#1a1a2e;color:#ef4444}.after-h{background:#0d2137;color:#22c55e}
+  .ba-body{background:#0f0e1a;padding:16px}
+  footer{text-align:center;color:#4b5563;font-size:12px;padding:40px 20px;border-top:1px solid #1e1b3a;margin-top:60px}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">Sub<span>Space</span></div>
+  <div class="nav-tabs">
+    <div class="nav-tab active">Dashboard</div>
+    <div class="nav-tab">Explore</div>
+    <div class="nav-tab">Wallet</div>
+    <div class="nav-tab">Chat</div>
+    <div class="nav-tab">Cart</div>
+  </div>
+  <div style="display:flex;gap:12px;align-items:center">
+    <span style="color:#9ca3af;font-size:13px">Bengaluru, KA</span>
+    <div style="width:32px;height:32px;background:#3b2e7a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">Y</div>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="pill">🎯 Proposed Fix — Pillar 1: UX</div>
+  <h1>Dashboard Redesign</h1>
+  <p class="sub">Renames 'Home' to 'Dashboard' (accurate label), surfaces Money Saved as a hero widget, adds projected savings for new users, and exposes quick actions. All data is already available — this is a layout and hierarchy fix.</p>
+
+  <!-- BEFORE / AFTER -->
+  <div class="section-title">Before vs After — Tab Name & Hero Section</div>
+  <div class="ba-grid">
+    <div class="ba-card">
+      <div class="ba-header before-h">❌ CURRENT — 'Home' Tab, Zero Savings Visible</div>
+      <div class="ba-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #1e1b3a">
+          <div style="background:#7c3aed;color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600">Home</div>
+          <div style="color:#6b7280;padding:6px 14px;font-size:12px">Explore</div>
+          <div style="color:#6b7280;padding:6px 14px;font-size:12px">Wallet</div>
+        </div>
+        <div style="background:#13112a;border-radius:10px;padding:40px 20px;text-align:center;margin-bottom:12px">
+          <div style="font-size:32px;margin-bottom:8px">📦</div>
+          <div style="font-size:14px;color:#6b7280">No Active Subscriptions</div>
+        </div>
+        <div style="font-size:11px;color:#4b5563;text-align:center">Money Saved: hidden 3 clicks deep. Savings: never shown. Quick actions: none.</div>
+      </div>
+    </div>
+    <div class="ba-card">
+      <div class="ba-header after-h">✅ PROPOSED — 'Dashboard' Tab, Savings Hero Widget</div>
+      <div class="ba-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #1e1b3a">
+          <div style="background:#7c3aed;color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600">Dashboard</div>
+          <div style="color:#6b7280;padding:6px 14px;font-size:12px">Explore</div>
+          <div style="color:#6b7280;padding:6px 14px;font-size:12px">Wallet</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#2d1f6e,#1e3a5f);border-radius:10px;padding:16px;margin-bottom:10px;border:1px solid #3b2e7a">
+          <div style="font-size:11px;color:#a78bfa;margin-bottom:4px">💰 TOTAL SAVED THROUGH SUBSPACE</div>
+          <div style="font-size:28px;font-weight:800;color:#fff;margin-bottom:4px">₹1,247</div>
+          <div style="display:flex;gap:8px">
+            <div style="background:rgba(255,255,255,.1);border-radius:6px;padding:6px 10px;text-align:center">
+              <div style="font-size:14px;font-weight:700;color:#22c55e">₹849</div>
+              <div style="font-size:10px;color:#9ca3af">Sharing</div>
+            </div>
+            <div style="background:rgba(255,255,255,.1);border-radius:6px;padding:6px 10px;text-align:center">
+              <div style="font-size:14px;font-weight:700;color:#60a5fa">₹398</div>
+              <div style="font-size:10px;color:#9ca3af">Gift Cards</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#22c55e;text-align:center">✅ Savings visible immediately. Proof of value on first visit.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL DASHBOARD -->
+  <div class="section-title">Full Proposed Dashboard</div>
+  <div class="dash">
+    <div class="dash-nav">
+      <div class="dash-tab active">My Subscriptions</div>
+      <div class="dash-tab">Money Saved</div>
+      <div class="dash-tab">Order History</div>
+      <div class="dash-tab">Rentals</div>
+    </div>
+    <div class="dash-body">
+
+      <!-- SAVINGS HERO -->
+      <div class="savings-hero">
+        <div class="savings-left">
+          <div class="savings-label">💰 Total Saved Through Subspace</div>
+          <div class="savings-amount">₹1,247</div>
+          <div class="savings-sub">Since joining · Updated in real-time</div>
+          <div class="mini-graph">
+            <div class="bar" style="height:20%"></div>
+            <div class="bar" style="height:35%"></div>
+            <div class="bar" style="height:45%"></div>
+            <div class="bar" style="height:40%"></div>
+            <div class="bar" style="height:60%"></div>
+            <div class="bar" style="height:75%"></div>
+            <div class="bar" style="height:100%"></div>
+          </div>
+        </div>
+        <div class="savings-cards">
+          <div class="sav-card"><div class="sav-card-val">₹849</div><div class="sav-card-label">Sharing Savings</div></div>
+          <div class="sav-card"><div class="sav-card-val">₹398</div><div class="sav-card-label">Purchase Savings</div></div>
+          <div class="sav-card"><div class="sav-card-val" style="color:#a78bfa">₹0</div><div class="sav-card-label">Earning</div></div>
+        </div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div style="grid-column:1/-1">
+        <div style="font-size:13px;font-weight:600;color:#9ca3af;margin-bottom:10px">Quick Actions</div>
+        <div class="quick-actions">
+          <div class="qa-btn">📺 Join a Group</div>
+          <div class="qa-btn">🎁 Buy Gift Card</div>
+          <div class="qa-btn">💸 Split a Bill</div>
+          <div class="qa-btn">📊 Track Subscriptions</div>
+          <div class="qa-btn">🤝 Share My Plan</div>
+        </div>
+      </div>
+
+      <!-- ACTIVE SUBSCRIPTIONS -->
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#9ca3af;margin-bottom:10px">Active Subscriptions (3)</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="sub-card">
+            <div class="sub-card-icon" style="background:#1a0000">📺</div>
+            <div class="sub-card-info">
+              <div class="sub-card-name">Netflix Standard</div>
+              <div class="sub-card-detail">Group · Renews Jun 28</div>
+            </div>
+            <div class="sub-card-price">
+              <div class="sub-card-amount">₹250/mo</div>
+              <div class="sub-card-save">Saving ₹249</div>
+            </div>
+          </div>
+          <div class="sub-card">
+            <div class="sub-card-icon" style="background:#001a00">🎵</div>
+            <div class="sub-card-info">
+              <div class="sub-card-name">Spotify Duo</div>
+              <div class="sub-card-detail">Group · Renews Jul 3</div>
+            </div>
+            <div class="sub-card-price">
+              <div class="sub-card-amount">₹99/mo</div>
+              <div class="sub-card-save">Saving ₹200</div>
+            </div>
+          </div>
+          <div class="sub-card">
+            <div class="sub-card-icon" style="background:#001a1a">📡</div>
+            <div class="sub-card-info">
+              <div class="sub-card-name">JioHotstar Premium</div>
+              <div class="sub-card-detail">Group · Renews Jun 30</div>
+            </div>
+            <div class="sub-card-price">
+              <div class="sub-card-amount">₹100/mo</div>
+              <div class="sub-card-save">Saving ₹400</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECOMMENDED -->
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#9ca3af;margin-bottom:10px">Recommended for You</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="rec-card">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="font-size:20px">🎵</div>
+              <div>
+                <div style="font-size:13px;font-weight:600">YouTube Premium</div>
+                <div style="font-size:11px;color:#22c55e">Join group → Save ₹200/month</div>
+              </div>
+            </div>
+            <button class="btn-join">Join ₹99/mo</button>
+          </div>
+          <div class="rec-card">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="font-size:20px">🍕</div>
+              <div>
+                <div style="font-size:13px;font-weight:600">Swiggy One</div>
+                <div style="font-size:11px;color:#22c55e">Join group → Save ₹149/month</div>
+              </div>
+            </div>
+            <button class="btn-join">Join ₹150/mo</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SAVINGS POTENTIAL BANNER -->
+      <div class="potential-banner">
+        <div class="pot-left">
+          <div class="pot-icon">💡</div>
+          <div>
+            <div class="pot-title">You could save ₹849 more this month</div>
+            <div class="pot-sub">Add Zomato Gold, YouTube Premium & Prime Video to groups</div>
+          </div>
+        </div>
+        <button class="btn-pot">See Opportunities →</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div style="height:32px"></div>
+  <div class="section-title">What Changed & Why</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+    <div style="background:#0f0e1a;border:1px solid #1e1b3a;border-radius:12px;padding:14px">
+      <div style="font-size:18px;margin-bottom:6px">🏷</div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:4px">'Home' → 'Dashboard'</div>
+      <div style="font-size:11px;color:#9ca3af">Accurate label. Shows personal data, not discovery feed.</div>
+    </div>
+    <div style="background:#0f0e1a;border:1px solid #1e1b3a;border-radius:12px;padding:14px">
+      <div style="font-size:18px;margin-bottom:6px">💰</div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:4px">Savings as Hero Widget</div>
+      <div style="font-size:11px;color:#9ca3af">Pulled from 3-click sidebar to top of page. Same data, 10x more visible.</div>
+    </div>
+    <div style="background:#0f0e1a;border:1px solid #1e1b3a;border-radius:12px;padding:14px">
+      <div style="font-size:18px;margin-bottom:6px">⚡</div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:4px">Quick Actions Row</div>
+      <div style="font-size:11px;color:#9ca3af">One-click access to most common tasks. Reduces navigation depth.</div>
+    </div>
+    <div style="background:#0f0e1a;border:1px solid #1e1b3a;border-radius:12px;padding:14px">
+      <div style="font-size:18px;margin-bottom:6px">🎯</div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:4px">Recommendations Panel</div>
+      <div style="font-size:11px;color:#9ca3af">Based on subscriptions user already pays for. Drives group joins.</div>
+    </div>
+  </div>
+</div>
+<footer>Subspace.money — Product Teardown · Proposed UI · Yash Vardhan Malik · 2026</footer>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subspace — Onboarding Flow (Proposed)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#09090f;color:#f1f0ff;min-height:100vh}
+  /* NAV */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;background:#0f0e1a;border-bottom:1px solid #1e1b3a;position:sticky;top:0;z-index:10}
+  .logo{font-size:22px;font-weight:800;color:#fff}.logo span{color:#a78bfa}
+  .nav-links{display:flex;gap:32px;font-size:14px;color:#9ca3af}
+  .nav-links span{cursor:pointer}.nav-links span:hover{color:#a78bfa}
+  .nav-right{display:flex;gap:12px;align-items:center}
+  .badge{background:#7c3aed;color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;display:flex;align-items:center;justify-content:center}
+  /* BADGE */
+  .pill{display:inline-flex;align-items:center;gap:6px;background:#1e1b3a;border:1px solid #7c3aed;border-radius:20px;padding:4px 14px;font-size:12px;color:#a78bfa;margin-bottom:24px}
+  /* LAYOUT */
+  .page{padding:40px 32px;max-width:1100px;margin:0 auto}
+  h1{font-size:28px;font-weight:700;margin-bottom:8px}
+  .sub{color:#9ca3af;font-size:14px;margin-bottom:40px}
+  /* BEFORE AFTER */
+  .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px}
+  .ba-card{border-radius:16px;overflow:hidden;border:1px solid #1e1b3a}
+  .ba-header{padding:12px 20px;font-size:12px;font-weight:700;letter-spacing:.08em;display:flex;align-items:center;gap:8px}
+  .before-h{background:#1a1a2e;color:#ef4444}.after-h{background:#0d2137;color:#22c55e}
+  .ba-body{background:#0f0e1a;padding:20px}
+  /* SCREENS */
+  .screen{background:#0f0e1a;border-radius:12px;border:1px solid #1e1b3a;overflow:hidden}
+  .screen-inner{padding:28px}
+  /* BEFORE MOCKUP */
+  .before-screen{padding:20px;display:flex;flex-direction:column;gap:12px}
+  .empty-icon{width:56px;height:56px;background:#1e1b3a;border-radius:12px;margin:40px auto 12px;display:flex;align-items:center;justify-content:center;font-size:24px}
+  .empty-title{text-align:center;font-size:14px;font-weight:600;color:#9ca3af}
+  .empty-sub{text-align:center;font-size:12px;color:#4b5563;margin-bottom:16px}
+  .btn-explore{background:#7c3aed;color:#fff;border-radius:8px;padding:12px;text-align:center;font-size:13px;font-weight:600;cursor:pointer}
+  /* ONBOARDING OVERLAY */
+  .overlay{position:relative;background:#09090f;border-radius:12px;overflow:hidden}
+  .overlay-bg{position:absolute;inset:0;background:rgba(0,0,0,.7);z-index:1}
+  .onboard-card{position:relative;z-index:2;background:#13112a;border:1px solid #3b2e7a;border-radius:16px;margin:16px;padding:28px}
+  .step-dots{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#3b2e7a}
+  .dot.active{background:#7c3aed;width:24px;border-radius:4px}
+  .onboard-icon{font-size:40px;margin-bottom:12px;text-align:center}
+  .onboard-title{font-size:18px;font-weight:700;text-align:center;margin-bottom:8px}
+  .onboard-desc{font-size:13px;color:#9ca3af;text-align:center;line-height:1.6;margin-bottom:20px}
+  .onboard-options{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+  .onboard-opt{display:flex;align-items:center;gap:12px;background:#1e1b3a;border:1px solid #3b2e7a;border-radius:10px;padding:12px 14px;cursor:pointer;transition:.2s}
+  .onboard-opt:hover,.onboard-opt.selected{border-color:#7c3aed;background:#2d1f6e}
+  .onboard-opt-icon{font-size:20px;width:32px;text-align:center}
+  .onboard-opt-text{font-size:13px;font-weight:600}
+  .onboard-opt-sub{font-size:11px;color:#9ca3af}
+  .onboard-btns{display:flex;gap:10px}
+  .btn-skip{flex:1;padding:10px;border-radius:8px;background:#1e1b3a;color:#9ca3af;font-size:13px;border:none;cursor:pointer;text-align:center}
+  .btn-next{flex:2;padding:10px;border-radius:8px;background:#7c3aed;color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;text-align:center}
+  /* STEP NAVIGATOR */
+  .step-nav{display:flex;gap:12px;margin-bottom:32px;flex-wrap:wrap}
+  .step-btn{padding:8px 18px;border-radius:20px;font-size:13px;font-weight:600;border:1px solid #3b2e7a;background:#0f0e1a;color:#9ca3af;cursor:pointer;transition:.2s}
+  .step-btn.active{background:#7c3aed;color:#fff;border-color:#7c3aed}
+  /* STEPS DISPLAY */
+  .steps-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:40px}
+  .step-card{background:#0f0e1a;border:1px solid #1e1b3a;border-radius:16px;overflow:hidden}
+  .step-card-header{background:#13112a;border-bottom:1px solid #1e1b3a;padding:12px 16px;display:flex;align-items:center;gap:10px}
+  .step-num{background:#7c3aed;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+  .step-card-title{font-size:13px;font-weight:600}
+  .step-card-body{padding:16px}
+  /* SAVING CALC */
+  .saving-preview{background:#0a1628;border:1px solid #1e3a5f;border-radius:10px;padding:12px;margin-top:10px}
+  .saving-preview-label{font-size:11px;color:#60a5fa;margin-bottom:4px}
+  .saving-preview-val{font-size:20px;font-weight:700;color:#22c55e}
+  .saving-preview-sub{font-size:11px;color:#9ca3af}
+  .tag{display:inline-block;background:#2d1f6e;color:#a78bfa;border-radius:6px;padding:2px 8px;font-size:11px;margin:2px}
+  /* INSIGHT BOX */
+  .insight{background:#0d2137;border-left:4px solid #22c55e;border-radius:0 8px 8px 0;padding:12px 16px;font-size:13px;color:#86efac;margin-top:12px}
+  /* RECOMMENDATION STRIP */
+  .rec-strip{background:#13112a;border:1px solid #3b2e7a;border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .rec-left{display:flex;align-items:center;gap:12px}
+  .rec-icon{font-size:28px}
+  .rec-title{font-size:14px;font-weight:600}
+  .rec-sub{font-size:12px;color:#9ca3af}
+  .rec-badge{background:#22c55e;color:#fff;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600}
+  footer{text-align:center;color:#4b5563;font-size:12px;padding:40px 20px;border-top:1px solid #1e1b3a;margin-top:60px}
+  .section-title{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+  .section-title::after{content:'';flex:1;height:1px;background:#1e1b3a}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">Sub<span>Space</span></div>
+  <div class="nav-links">
+    <span>Dashboard</span><span>Explore</span><span>Wallet</span><span>Chat</span><span>Cart</span>
+  </div>
+  <div class="nav-right">
+    <span style="color:#9ca3af;font-size:13px">Bengaluru, KA</span>
+    <div class="badge">1</div>
+    <div style="width:32px;height:32px;background:#3b2e7a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">Y</div>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="pill">🎯 Proposed Fix — Pillar 1: UX</div>
+  <h1>First-Run Onboarding Flow</h1>
+  <p class="sub">Currently Subspace shows a blank screen to new users with no guidance. This 3-step overlay runs once on first login, is fully skippable, and never shown again.</p>
+
+  <!-- BEFORE / AFTER -->
+  <div class="section-title">Before vs After</div>
+  <div class="ba-grid">
+    <div class="ba-card">
+      <div class="ba-header before-h">❌ &nbsp;CURRENT — Dead Empty State</div>
+      <div class="ba-body">
+        <div class="before-screen">
+          <div style="display:flex;gap:10px;margin-bottom:16px;font-size:12px;color:#6b7280">
+            <span style="color:#7c3aed">+ Add Subscriptions</span>
+            <span>Bill Payments</span>
+            <span>Events</span>
+          </div>
+          <div class="empty-icon">📦</div>
+          <div class="empty-title">No Active Subscriptions</div>
+          <div class="empty-sub">Start exploring services and manage your subscriptions</div>
+          <div class="btn-explore">+ Explore Services</div>
+          <div style="color:#4b5563;font-size:11px;text-align:center;margin-top:8px">No context. No guidance. User has no idea what to do.</div>
+        </div>
+      </div>
+    </div>
+    <div class="ba-card">
+      <div class="ba-header after-h">✅ &nbsp;PROPOSED — Guided First Session</div>
+      <div class="ba-body">
+        <div class="overlay">
+          <div style="filter:blur(1px);padding:16px">
+            <div style="height:40px;background:#1e1b3a;border-radius:6px;margin-bottom:10px"></div>
+            <div style="height:80px;background:#13112a;border-radius:8px"></div>
+          </div>
+          <div class="overlay-bg"></div>
+          <div class="onboard-card">
+            <div class="step-dots">
+              <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+            <div class="onboard-icon">👋</div>
+            <div class="onboard-title">Welcome to Subspace!</div>
+            <div class="onboard-desc">Save money on every subscription you use. What are you here for?</div>
+            <div class="onboard-options">
+              <div class="onboard-opt selected">
+                <div class="onboard-opt-icon">📺</div>
+                <div><div class="onboard-opt-text">Save on subscriptions</div><div class="onboard-opt-sub">Split Netflix, Spotify, Hotstar with others</div></div>
+              </div>
+              <div class="onboard-opt">
+                <div class="onboard-opt-icon">🤝</div>
+                <div><div class="onboard-opt-text">Share my plan & earn</div><div class="onboard-opt-sub">Monetise your unused subscription slots</div></div>
+              </div>
+              <div class="onboard-opt">
+                <div class="onboard-opt-icon">🏪</div>
+                <div><div class="onboard-opt-text">Sell products / gift cards</div><div class="onboard-opt-sub">List on Subspace marketplace</div></div>
+              </div>
+            </div>
+            <div class="onboard-btns">
+              <button class="btn-skip">Skip</button>
+              <button class="btn-next">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALL 3 STEPS -->
+  <div class="section-title">All 3 Onboarding Steps</div>
+  <div class="steps-row">
+    <!-- Step 1 -->
+    <div class="step-card">
+      <div class="step-card-header">
+        <div class="step-num">1</div>
+        <div class="step-card-title">Choose Your Goal</div>
+      </div>
+      <div class="step-card-body">
+        <div style="font-size:12px;color:#9ca3af;margin-bottom:12px">User self-selects their primary intent. Personalises the rest of the session.</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="background:#2d1f6e;border:1px solid #7c3aed;border-radius:8px;padding:8px 12px;font-size:12px;display:flex;align-items:center;gap:8px">
+            <span>📺</span><span style="font-weight:600">Save on subscriptions</span>
+          </div>
+          <div style="background:#1e1b3a;border:1px solid #3b2e7a;border-radius:8px;padding:8px 12px;font-size:12px;display:flex;align-items:center;gap:8px">
+            <span>🤝</span><span>Share my plan & earn</span>
+          </div>
+          <div style="background:#1e1b3a;border:1px solid #3b2e7a;border-radius:8px;padding:8px 12px;font-size:12px;display:flex;align-items:center;gap:8px">
+            <span>🏪</span><span>Sell products / gift cards</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Step 2 -->
+    <div class="step-card">
+      <div class="step-card-header">
+        <div class="step-num">2</div>
+        <div class="step-card-title">See Your Savings Potential</div>
+      </div>
+      <div class="step-card-body">
+        <div style="font-size:12px;color:#9ca3af;margin-bottom:12px">Based on step 1 answer. Shows how much they could save before any purchase.</div>
+        <div style="font-size:12px;color:#d1d5db;margin-bottom:8px">You subscribed to:</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px">
+          <span class="tag">📺 Netflix</span>
+          <span class="tag">🎵 Spotify</span>
+          <span class="tag">📺 Hotstar</span>
+        </div>
+        <div class="saving-preview">
+          <div class="saving-preview-label">💡 If you join groups today</div>
+          <div class="saving-preview-val">Save ₹849/month</div>
+          <div class="saving-preview-sub">That's ₹10,188 per year back in your pocket</div>
+        </div>
+      </div>
+    </div>
+    <!-- Step 3 -->
+    <div class="step-card">
+      <div class="step-card-header">
+        <div class="step-num">3</div>
+        <div class="step-card-title">First Recommendation</div>
+      </div>
+      <div class="step-card-body">
+        <div style="font-size:12px;color:#9ca3af;margin-bottom:12px">One personalised action. Clear CTA. Onboarding ends — user immediately has a reason to engage.</div>
+        <div class="rec-strip" style="flex-direction:column;align-items:flex-start;gap:10px">
+          <div class="rec-left">
+            <div class="rec-icon">📺</div>
+            <div>
+              <div class="rec-title">Netflix Standard Plan</div>
+              <div class="rec-sub">Join with 1 other → ₹250/month (save ₹249)</div>
+            </div>
+          </div>
+          <div style="width:100%;background:#7c3aed;color:#fff;border-radius:8px;padding:10px;text-align:center;font-size:13px;font-weight:600">Join a Group — ₹250/month →</div>
+        </div>
+        <div class="insight">✅ Onboarding complete. Never shown again.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESIGN NOTES -->
+  <div class="section-title">Design Decisions</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+    <div style="background:#0f0e1a;border:1px solid #1e1b3a;border-radius:12px;padding:16px">
+      <div style="font-size:20px;margin-bottom:8px">⚡</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">3 Steps Maximum</div>
+      <div style="font-size:12px;color:#9ca3af">Research shows drop-off spikes after 3 onboarding screens. We stay within that limit.</div>
+    </div>
+    <div style="background:#0f0e1a;border:1px solid #1e1b3a;border-radius:12px;padding:16px">
+      <div style="font-size:20px;margin-bottom:8px">🎯</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">Role-Based Personalisation</div>
+      <div style="font-size:12px;color:#9ca3af">Step 1 answer changes what the user sees in Steps 2 & 3. Buyers see savings. Sellers see earnings.</div>
+    </div>
+    <div style="background:#0f0e1a;border:1px solid #1e1b3a;border-radius:12px;padding:16px">
+      <div style="font-size:20px;margin-bottom:8px">🔁</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">One-Time Only</div>
+      <div style="font-size:12px;color:#9ca3af">Stored in user preferences. Never interrupts returning users. Skip always available.</div>
+    </div>
+  </div>
+</div>
+
+<footer>Subspace.money — Product Teardown · Proposed UI · Yash Vardhan Malik · 2026</footer>
+</body>
+</html>

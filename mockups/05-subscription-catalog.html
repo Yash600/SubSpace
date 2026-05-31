@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subspace — Subscription Catalog (Proposed)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#09090f;color:#f1f0ff;min-height:100vh}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;background:#0f0e1a;border-bottom:1px solid #1e1b3a;position:sticky;top:0;z-index:10}
+  .logo{font-size:22px;font-weight:800;color:#fff}.logo span{color:#a78bfa}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:#1e1b3a;border:1px solid #7c3aed;border-radius:20px;padding:4px 14px;font-size:12px;color:#a78bfa;margin-bottom:24px}
+  .page{padding:32px;max-width:1100px;margin:0 auto}
+  h1{font-size:28px;font-weight:700;margin-bottom:8px}
+  .sub{color:#9ca3af;font-size:14px;margin-bottom:40px}
+  .section-title{font-size:17px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+  .section-title::after{content:'';flex:1;height:1px;background:#1e1b3a}
+  /* MODAL */
+  .modal{background:#0f0e1a;border:1px solid #3b2e7a;border-radius:16px;overflow:hidden;max-width:520px;margin:0 auto 48px}
+  .modal-header{background:#13112a;padding:16px 20px;border-bottom:1px solid #1e1b3a;display:flex;justify-content:space-between;align-items:center}
+  .modal-title{font-size:15px;font-weight:700}
+  .modal-sub{font-size:12px;color:#9ca3af;margin-top:2px}
+  .modal-close{color:#9ca3af;font-size:18px;cursor:pointer}
+  .modal-body{padding:20px}
+  /* SEARCH */
+  .search-box{display:flex;align-items:center;gap:10px;background:#1e1b3a;border:1px solid #3b2e7a;border-radius:10px;padding:10px 14px;margin-bottom:16px}
+  .search-box input{background:none;border:none;outline:none;color:#f1f0ff;font-size:14px;flex:1}
+  .search-box input::placeholder{color:#6b7280}
+  /* CATEGORY PILLS */
+  .cat-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  .cat-pill{background:#1e1b3a;border:1px solid #3b2e7a;border-radius:20px;padding:5px 12px;font-size:12px;color:#9ca3af;cursor:pointer;transition:.2s}
+  .cat-pill:hover,.cat-pill.active{background:#2d1f6e;border-color:#7c3aed;color:#a78bfa}
+  /* RESULTS LABEL */
+  .results-label{font-size:12px;color:#9ca3af;margin-bottom:8px}
+  /* SERVICE LIST */
+  .service-list{display:flex;flex-direction:column;gap:4px;max-height:320px;overflow-y:auto}
+  .service-list::-webkit-scrollbar{width:4px}
+  .service-list::-webkit-scrollbar-track{background:#1e1b3a;border-radius:2px}
+  .service-list::-webkit-scrollbar-thumb{background:#7c3aed;border-radius:2px}
+  .svc{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:.2s;border:1px solid transparent}
+  .svc:hover{background:#13112a;border-color:#3b2e7a}
+  .svc-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .svc-name{font-size:13px;font-weight:600;flex:1}
+  .svc-cat{font-size:11px;color:#9ca3af}
+  .svc-price{font-size:12px;color:#a78bfa;font-weight:600;white-space:nowrap}
+  .svc-add{background:#7c3aed;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0}
+  /* PRICE INPUT */
+  .price-section{background:#13112a;border-radius:10px;padding:14px;margin-top:12px;border:1px solid #3b2e7a}
+  .price-label{font-size:11px;color:#9ca3af;margin-bottom:8px}
+  .price-input{display:flex;align-items:center;gap:8px;background:#0f0e1a;border:1px solid #3b2e7a;border-radius:8px;padding:10px 12px;margin-bottom:10px}
+  .price-input span{color:#a78bfa;font-size:14px}
+  .price-input input{background:none;border:none;outline:none;color:#f1f0ff;font-size:18px;font-weight:700;width:100%}
+  .price-presets{display:flex;gap:6px;flex-wrap:wrap}
+  .preset{background:#1e1b3a;border:1px solid #3b2e7a;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;transition:.2s}
+  .preset:hover{border-color:#7c3aed;color:#a78bfa}
+  .btn-add-sub{width:100%;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px}
+  /* CUSTOM ADD */
+  .custom-add{display:flex;align-items:center;gap:10px;background:#0a1628;border:1px dashed #1e3a5f;border-radius:8px;padding:10px 14px;margin-top:8px;cursor:pointer}
+  .custom-add-text{font-size:12px;color:#60a5fa}
+  /* BEFORE CARD */
+  .before-card{background:#1a0a0a;border:1px solid #7f1d1d;border-radius:12px;padding:16px;margin-bottom:24px}
+  .bc-title{font-size:13px;font-weight:600;color:#ef4444;margin-bottom:10px}
+  .bc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .bc-item{background:#0f0e1a;border:1px solid #3b2e7a;border-radius:8px;padding:8px;text-align:center;font-size:12px}
+  .bc-item-icon{font-size:18px;margin-bottom:4px}
+  .bc-item-name{font-size:11px;color:#9ca3af}
+  /* CATEGORY GRID */
+  .cat-showcase{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px}
+  .cat-card{background:#0f0e1a;border:1px solid #1e1b3a;border-radius:12px;padding:14px}
+  .cat-card-title{font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .cat-services{display:flex;flex-direction:column;gap:4px}
+  .cat-svc{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#9ca3af;padding:3px 0}
+  .cat-svc span:last-child{color:#a78bfa;font-weight:600}
+  footer{text-align:center;color:#4b5563;font-size:12px;padding:40px 20px;border-top:1px solid #1e1b3a;margin-top:60px}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">Sub<span>Space</span></div>
+  <div style="display:flex;gap:8px;font-size:13px;color:#9ca3af">
+    <span>Dashboard</span><span>Explore</span><span>Wallet</span>
+  </div>
+  <div style="width:32px;height:32px;background:#3b2e7a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">Y</div>
+</nav>
+<div class="page">
+  <div class="pill">🎯 Proposed Fix — Pillar 2: Features / Services</div>
+  <h1>Subscription Catalog Expansion</h1>
+  <p class="sub">Current catalog: 8 subscriptions. Proposed: 50+ across 8 categories covering streaming, food, fitness, music, productivity, news, fintech, and more — plus a free-text fallback for anything not listed.</p>
+
+  <!-- BEFORE -->
+  <div class="section-title">Current State — Only 8 Options</div>
+  <div class="before-card">
+    <div class="bc-title">❌ Current Add Subscription catalog — 8 services total</div>
+    <div class="bc-grid">
+      <div class="bc-item"><div class="bc-item-icon">📺</div><div class="bc-item-name">Netflix</div></div>
+      <div class="bc-item"><div class="bc-item-icon">📦</div><div class="bc-item-name">Prime Video</div></div>
+      <div class="bc-item"><div class="bc-item-icon">📡</div><div class="bc-item-name">JioHotstar</div></div>
+      <div class="bc-item"><div class="bc-item-icon">▶️</div><div class="bc-item-name">YouTube Premium</div></div>
+      <div class="bc-item"><div class="bc-item-icon">📺</div><div class="bc-item-name">Zee5</div></div>
+      <div class="bc-item"><div class="bc-item-icon">🤖</div><div class="bc-item-name">Claude AI</div></div>
+      <div class="bc-item"><div class="bc-item-icon">🎵</div><div class="bc-item-name">Spotify</div></div>
+      <div class="bc-item"><div class="bc-item-icon">📺</div><div class="bc-item-name">Crunchyroll</div></div>
+    </div>
+    <div style="font-size:11px;color:#ef4444;margin-top:10px">Missing: Swiggy One, Zomato Gold, Myntra Insider, gym memberships, insurance, CRED, PhonePe Switch, newspapers, and dozens more that Indians actually pay for monthly.</div>
+  </div>
+
+  <!-- PROPOSED MODAL -->
+  <div class="section-title">Proposed — 50+ Services with Category Filters</div>
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Track a Subscription</div>
+        <div class="modal-sub">Search from 50+ services or add any custom subscription</div>
+      </div>
+      <div class="modal-close">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="search-box">
+        <span style="color:#9ca3af">🔍</span>
+        <input type="text" placeholder="Search Netflix, Swiggy, gym...">
+      </div>
+      <div class="cat-pills">
+        <div class="cat-pill active">All</div>
+        <div class="cat-pill">📺 Streaming</div>
+        <div class="cat-pill">🍕 Food</div>
+        <div class="cat-pill">🎵 Music</div>
+        <div class="cat-pill">💪 Fitness</div>
+        <div class="cat-pill">💼 Productivity</div>
+        <div class="cat-pill">📰 News</div>
+        <div class="cat-pill">💳 Fintech</div>
+      </div>
+      <div class="results-label">52 services available</div>
+      <div class="service-list">
+        <div class="svc"><div class="svc-icon" style="background:#1a0000">📺</div><div><div class="svc-name">Netflix Standard</div><div class="svc-cat">Streaming</div></div><div class="svc-price">₹499/mo</div><button class="svc-add">+ Add</button></div>
+        <div class="svc"><div class="svc-icon" style="background:#001a00">🎵</div><div><div class="svc-name">Spotify Premium</div><div class="svc-cat">Music</div></div><div class="svc-price">₹119/mo</div><button class="svc-add">+ Add</button></div>
+        <div class="svc"><div class="svc-icon" style="background:#1a0e00">🍕</div><div><div class="svc-name">Swiggy One</div><div class="svc-cat">Food Delivery</div></div><div class="svc-price">₹299/mo</div><button class="svc-add">+ Add</button></div>
+        <div class="svc"><div class="svc-icon" style="background:#0a1a00">🍔</div><div><div class="svc-name">Zomato Gold</div><div class="svc-cat">Food Delivery</div></div><div class="svc-price">₹149/mo</div><button class="svc-add">+ Add</button></div>
+        <div class="svc"><div class="svc-icon" style="background:#00001a">👗</div><div><div class="svc-name">Myntra Insider</div><div class="svc-cat">Fashion</div></div><div class="svc-price">₹299/yr</div><button class="svc-add">+ Add</button></div>
+        <div class="svc"><div class="svc-icon" style="background:#001a1a">💪</div><div><div class="svc-name">Cult.fit</div><div class="svc-cat">Fitness</div></div><div class="svc-price">₹999/mo</div><button class="svc-add">+ Add</button></div>
+        <div class="svc"><div class="svc-icon" style="background:#1a001a">💳</div><div><div class="svc-name">CRED</div><div class="svc-cat">Fintech</div></div><div class="svc-price">Free</div><button class="svc-add">+ Add</button></div>
+        <div class="svc"><div class="svc-icon" style="background:#0a0a1a">📰</div><div><div class="svc-name">The Hindu Digital</div><div class="svc-cat">News</div></div><div class="svc-price">₹199/mo</div><button class="svc-add">+ Add</button></div>
+        <div class="svc"><div class="svc-icon" style="background:#001a0a">📡</div><div><div class="svc-name">JioHotstar Premium</div><div class="svc-cat">Streaming</div></div><div class="svc-price">₹299/mo</div><button class="svc-add">+ Add</button></div>
+        <div class="svc"><div class="svc-icon" style="background:#1a1a00">📺</div><div><div class="svc-name">SonyLIV Premium</div><div class="svc-cat">Streaming</div></div><div class="svc-price">₹299/mo</div><button class="svc-add">+ Add</button></div>
+        <div class="svc"><div class="svc-icon" style="background:#0a001a">▶️</div><div><div class="svc-name">YouTube Premium</div><div class="svc-cat">Streaming</div></div><div class="svc-price">₹139/mo</div><button class="svc-add">+ Add</button></div>
+        <div class="svc"><div class="svc-icon" style="background:#001a00">🏋️</div><div><div class="svc-name">Gym Membership</div><div class="svc-cat">Fitness</div></div><div class="svc-price">Custom</div><button class="svc-add">+ Add</button></div>
+      </div>
+      <div class="custom-add">
+        <span style="font-size:18px">➕</span>
+        <div class="custom-add-text">Can't find your subscription? Add any custom subscription manually →</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORY SHOWCASE -->
+  <div class="section-title">Proposed Category Breakdown (50+ Services)</div>
+  <div class="cat-showcase">
+    <div class="cat-card">
+      <div class="cat-card-title">📺 Streaming (12)</div>
+      <div class="cat-services">
+        <div class="cat-svc"><span>Netflix Standard</span><span>₹499/mo</span></div>
+        <div class="cat-svc"><span>JioHotstar Premium</span><span>₹299/mo</span></div>
+        <div class="cat-svc"><span>Amazon Prime Video</span><span>₹299/mo</span></div>
+        <div class="cat-svc"><span>SonyLIV Premium</span><span>₹299/mo</span></div>
+        <div class="cat-svc" style="color:#7c3aed;font-size:11px">+ 8 more →</div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-card-title">🍕 Food & Delivery (6)</div>
+      <div class="cat-services">
+        <div class="cat-svc"><span>Swiggy One</span><span>₹299/mo</span></div>
+        <div class="cat-svc"><span>Zomato Gold</span><span>₹149/mo</span></div>
+        <div class="cat-svc"><span>Blinkit Express</span><span>₹99/mo</span></div>
+        <div class="cat-svc"><span>Zepto Pass</span><span>₹99/mo</span></div>
+        <div class="cat-svc" style="color:#7c3aed;font-size:11px">+ 2 more →</div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-card-title">🎵 Music (5)</div>
+      <div class="cat-services">
+        <div class="cat-svc"><span>Spotify Premium</span><span>₹119/mo</span></div>
+        <div class="cat-svc"><span>Apple Music</span><span>₹99/mo</span></div>
+        <div class="cat-svc"><span>Gaana Plus</span><span>₹99/mo</span></div>
+        <div class="cat-svc"><span>JioSaavn Pro</span><span>₹99/mo</span></div>
+        <div class="cat-svc" style="color:#7c3aed;font-size:11px">+ 1 more →</div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-card-title">💪 Fitness (5)</div>
+      <div class="cat-services">
+        <div class="cat-svc"><span>Cult.fit</span><span>₹999/mo</span></div>
+        <div class="cat-svc"><span>Cure.fit</span><span>₹799/mo</span></div>
+        <div class="cat-svc"><span>HealthifyMe</span><span>₹499/mo</span></div>
+        <div class="cat-svc"><span>Local Gym</span><span>Custom</span></div>
+        <div class="cat-svc" style="color:#7c3aed;font-size:11px">+ 1 more →</div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-card-title">💼 Productivity (8)</div>
+      <div class="cat-services">
+        <div class="cat-svc"><span>Claude by Anthropic</span><span>₹1,700/mo</span></div>
+        <div class="cat-svc"><span>ChatGPT Plus</span><span>₹1,700/mo</span></div>
+        <div class="cat-svc"><span>Notion</span><span>₹800/mo</span></div>
+        <div class="cat-svc"><span>Adobe Creative</span><span>₹1,675/mo</span></div>
+        <div class="cat-svc" style="color:#7c3aed;font-size:11px">+ 4 more →</div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-card-title">💳 Fintech & Shopping (8)</div>
+      <div class="cat-services">
+        <div class="cat-svc"><span>CRED</span><span>Free</span></div>
+        <div class="cat-svc"><span>Myntra Insider</span><span>₹299/yr</span></div>
+        <div class="cat-svc"><span>PhonePe Switch</span><span>₹99/mo</span></div>
+        <div class="cat-svc"><span>Navi Insurance</span><span>Custom</span></div>
+        <div class="cat-svc" style="color:#7c3aed;font-size:11px">+ 4 more →</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#0a1628;border:1px solid #1e3a5f;border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:12px">
+    <div style="font-size:24px">💡</div>
+    <div>
+      <div style="font-size:13px;font-weight:600;color:#60a5fa;margin-bottom:4px">The Core Insight</div>
+      <div style="font-size:12px;color:#9ca3af">Going from 8 to 50+ services isn't just a feature improvement — it's delivering on the product's core promise of 'manage all your subscriptions'. Every service added is a reason for a new user to stay.</div>
+    </div>
+  </div>
+</div>
+<footer>Subspace.money — Product Teardown · Proposed UI · Yash Vardhan Malik · 2026</footer>
+</body>
+</html>

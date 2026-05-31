@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subspace — Checkout Redesign (Proposed)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#09090f;color:#f1f0ff;min-height:100vh}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;background:#0f0e1a;border-bottom:1px solid #1e1b3a;position:sticky;top:0;z-index:10}
+  .logo{font-size:22px;font-weight:800;color:#fff}.logo span{color:#a78bfa}
+  .page{padding:32px;max-width:1100px;margin:0 auto}
+  h1{font-size:28px;font-weight:700;margin-bottom:8px}
+  .sub{color:#9ca3af;font-size:14px;margin-bottom:40px}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:#1e1b3a;border:1px solid #7c3aed;border-radius:20px;padding:4px 14px;font-size:12px;color:#a78bfa;margin-bottom:24px}
+  .section-title{font-size:17px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px;color:#e5e7eb}
+  .section-title::after{content:'';flex:1;height:1px;background:#1e1b3a}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:48px}
+  .card{background:#0f0e1a;border-radius:16px;overflow:hidden;border:1px solid #1e1b3a}
+  .card-header{padding:12px 20px;font-size:12px;font-weight:700;letter-spacing:.06em}
+  .bh{background:#1a1a2e;color:#ef4444}.ah{background:#0d2137;color:#22c55e}
+  .card-body{padding:20px}
+  /* CHECKOUT CARD */
+  .checkout{background:#0f0e1a;border:1px solid #3b2e7a;border-radius:14px;overflow:hidden}
+  .co-header{background:#13112a;padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #1e1b3a}
+  .co-icon{width:44px;height:44px;border-radius:10px;background:#1a0000;display:flex;align-items:center;justify-content:center;font-size:22px}
+  .co-title{font-size:16px;font-weight:700}
+  .co-sub{font-size:12px;color:#9ca3af;margin-top:2px}
+  .co-body{padding:20px}
+  .co-section{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #1e1b3a}
+  .co-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+  .co-label{font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+  .owner-row{display:flex;align-items:center;gap:10px}
+  .owner-avatar{width:36px;height:36px;border-radius:50%;background:#3b2e7a;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .owner-name{font-size:14px;font-weight:600}
+  .owner-badge{background:#22c55e20;color:#22c55e;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600;margin-left:8px}
+  /* FILL BAR */
+  .fill-section{background:#13112a;border-radius:10px;padding:14px}
+  .fill-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .fill-label{font-size:12px;color:#9ca3af}
+  .fill-count{font-size:12px;font-weight:600;color:#a78bfa}
+  .fill-bar-bg{background:#1e1b3a;border-radius:20px;height:8px;overflow:hidden;margin-bottom:8px}
+  .fill-bar{background:linear-gradient(90deg,#7c3aed,#a78bfa);height:100%;border-radius:20px}
+  .fill-slots{display:flex;gap:6px}
+  .slot{flex:1;height:32px;border-radius:8px;border:1px dashed #3b2e7a;display:flex;align-items:center;justify-content:center;font-size:11px;color:#9ca3af}
+  .slot.filled{background:#2d1f6e;border-color:#7c3aed;color:#a78bfa}
+  .slot.you{background:#7c3aed;border-color:#a78bfa;color:#fff;font-weight:600}
+  /* DATE SECTION */
+  .date-box{background:#0a1628;border:1px solid #1e3a5f;border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px}
+  .date-icon{font-size:20px}
+  .date-label{font-size:12px;color:#60a5fa}
+  .date-val{font-size:14px;font-weight:600;color:#fff;margin-top:2px}
+  .date-explain{font-size:11px;color:#9ca3af;margin-top:2px}
+  /* PRORATA */
+  .prorata{background:#0a1a0f;border:1px solid #166534;border-radius:10px;padding:12px 16px}
+  .prorata-title{font-size:12px;font-weight:600;color:#86efac;margin-bottom:6px}
+  .prorata-row{display:flex;justify-content:space-between;font-size:12px;color:#9ca3af;margin-bottom:4px}
+  .prorata-row span:last-child{color:#d1d5db}
+  /* BILLING */
+  .billing-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;color:#9ca3af}
+  .billing-row span:last-child{color:#d1d5db}
+  .billing-total{display:flex;justify-content:space-between;font-size:16px;font-weight:700;padding-top:12px;border-top:1px solid #1e1b3a}
+  .billing-total span:last-child{color:#a78bfa}
+  .btn-pay{width:100%;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px;letter-spacing:.02em}
+  /* GUARANTEE */
+  .guarantee{background:#0a1628;border:1px solid #1e3a5f;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-top:10px}
+  .g-icon{font-size:16px}
+  .g-text{font-size:11px;color:#60a5fa}
+  /* ISSUES */
+  .issue-list{display:flex;flex-direction:column;gap:10px}
+  .issue{background:#1a0a0a;border:1px solid #7f1d1d;border-left:4px solid #ef4444;border-radius:0 8px 8px 0;padding:10px 14px}
+  .issue-title{font-size:12px;font-weight:600;color:#fca5a5;margin-bottom:3px}
+  .issue-desc{font-size:11px;color:#9ca3af}
+  footer{text-align:center;color:#4b5563;font-size:12px;padding:40px 20px;border-top:1px solid #1e1b3a;margin-top:60px}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">Sub<span>Space</span></div>
+  <div style="display:flex;gap:4px">
+    <div style="color:#9ca3af;padding:7px 16px;font-size:13px">Dashboard</div>
+    <div style="color:#9ca3af;padding:7px 16px;font-size:13px">Explore</div>
+  </div>
+  <div style="width:32px;height:32px;background:#3b2e7a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">Y</div>
+</nav>
+<div class="page">
+  <div class="pill">🎯 Proposed Fix — Pillar 1: UX</div>
+  <h1>Checkout Screen Redesign</h1>
+  <p class="sub">Fixes the wrong date copy, adds group fill visualisation, explains pro-rata billing, and adds the Subspace Guarantee — all on the checkout screen.</p>
+
+  <div class="section-title">Before vs After — Netflix Standard Plan</div>
+  <div class="grid2">
+    <!-- BEFORE -->
+    <div class="card">
+      <div class="card-header bh">❌ CURRENT — 3 Critical Issues</div>
+      <div class="card-body">
+        <div class="checkout">
+          <div class="co-header">
+            <div class="co-icon">📺</div>
+            <div><div class="co-title">Standard Plan</div><div class="co-sub">Netflix</div></div>
+          </div>
+          <div class="co-body">
+            <div class="co-section">
+              <div class="co-label">Group Owner</div>
+              <div class="owner-row">
+                <div class="owner-avatar">Y</div>
+                <div class="owner-name">Yogesh kumar Saini</div>
+              </div>
+            </div>
+            <div class="co-section">
+              <div class="co-label">Members</div>
+              <div style="background:#1e1b3a;border-radius:6px;height:6px;margin-bottom:8px">
+                <div style="background:#7c3aed;width:0%;height:100%;border-radius:6px"></div>
+              </div>
+              <div style="text-align:right;font-size:12px;color:#9ca3af">0 / 2 members</div>
+              <div style="background:#1a0a0a;border:1px solid #7f1d1d;border-radius:6px;padding:8px;margin-top:8px;font-size:11px;color:#ef4444">⚠ Group is empty — no members yet</div>
+            </div>
+            <div class="co-section">
+              <div style="background:#1a0a0a;border:1px solid #7f1d1d;border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px">
+                <div style="font-size:18px">🕐</div>
+                <div>
+                  <div style="font-size:11px;color:#9ca3af">Next payment will be charged on:</div>
+                  <div style="font-size:15px;font-weight:700;color:#ef4444">Jun 21, 2028</div>
+                  <div style="font-size:10px;color:#7f1d1d;margin-top:2px">❌ Wrong — this is 2 years in the future on a monthly plan</div>
+                </div>
+              </div>
+            </div>
+            <div class="co-section">
+              <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700">
+                <span>Net Payable</span><span style="color:#a78bfa">₹262.50</span>
+              </div>
+              <div style="font-size:11px;color:#4b5563;margin-top:6px;text-align:center">No pro-rata info. No guarantee. No clarity.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px">
+          <div style="font-size:12px;font-weight:600;color:#ef4444;margin-bottom:8px">Issues Found:</div>
+          <div class="issue-list">
+            <div class="issue">
+              <div class="issue-title">Wrong date copy</div>
+              <div class="issue-desc">"Next payment will be charged on" reads as buyer's billing date. Shows Jun 2028 on a monthly plan.</div>
+            </div>
+            <div class="issue">
+              <div class="issue-title">0/2 members — empty group</div>
+              <div class="issue-desc">No estimated fill time. No fallback. User doesn't know if this group will ever fill.</div>
+            </div>
+            <div class="issue">
+              <div class="issue-title">No pro-rata or guarantee</div>
+              <div class="issue-desc">What if I join mid-cycle? What if the group breaks? Zero answers.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AFTER -->
+    <div class="card">
+      <div class="card-header ah">✅ PROPOSED — Clear, Trustworthy, Informative</div>
+      <div class="card-body">
+        <div class="checkout">
+          <div class="co-header">
+            <div class="co-icon">📺</div>
+            <div><div class="co-title">Standard Plan</div><div class="co-sub">Netflix · ₹499/month full price</div></div>
+          </div>
+          <div class="co-body">
+            <!-- OWNER -->
+            <div class="co-section">
+              <div class="co-label">Managed by Subspace</div>
+              <div style="display:flex;align-items:center;gap:8px;background:#13112a;border-radius:8px;padding:8px 12px">
+                <div style="font-size:16px">🛡</div>
+                <div style="font-size:12px;color:#a78bfa">Account credentials secured by Subspace — no personal sharing required</div>
+              </div>
+            </div>
+            <!-- FILL -->
+            <div class="co-section">
+              <div class="co-label">Group Fill Status</div>
+              <div class="fill-section">
+                <div class="fill-header">
+                  <div class="fill-label">1 slot remaining after you join</div>
+                  <div class="fill-count">1 / 2 members</div>
+                </div>
+                <div class="fill-bar-bg"><div class="fill-bar" style="width:50%"></div></div>
+                <div class="fill-slots">
+                  <div class="slot you">You</div>
+                  <div class="slot">Open slot</div>
+                </div>
+                <div style="font-size:11px;color:#22c55e;margin-top:8px">⚡ Groups like this typically fill within 2-3 days</div>
+              </div>
+            </div>
+            <!-- DATE -->
+            <div class="co-section">
+              <div class="co-label">Billing Cycle</div>
+              <div class="date-box">
+                <div class="date-icon">📅</div>
+                <div>
+                  <div class="date-label">This group's subscription renews on</div>
+                  <div class="date-val">Jun 28, 2026</div>
+                  <div class="date-explain">Your personal charge happens on renewal date each month</div>
+                </div>
+              </div>
+            </div>
+            <!-- PRORATA -->
+            <div class="co-section">
+              <div class="prorata">
+                <div class="prorata-title">💡 First Month — Pro-Rata Breakdown</div>
+                <div class="prorata-row"><span>Days remaining this cycle (8 of 30)</span><span>₹70</span></div>
+                <div class="prorata-row"><span>From next cycle onwards</span><span>₹262.50/month</span></div>
+                <div style="font-size:11px;color:#4ade80;margin-top:6px">You only pay for days you actually use this month.</div>
+              </div>
+            </div>
+            <!-- BILLING -->
+            <div class="co-section">
+              <div class="billing-row"><span>Subscription cost (split 2 ways)</span><span>₹249.50</span></div>
+              <div class="billing-row"><span>Subspace service fee (5.2%)</span><span>₹13.00</span></div>
+              <div class="billing-total"><span>Net Payable Today</span><span>₹262.50</span></div>
+              <button class="btn-pay">Pay ₹262.50 Securely →</button>
+              <div class="guarantee">
+                <div class="g-icon">🛡</div>
+                <div class="g-text">Subspace Guarantee: If this group breaks, your next month is free. No questions asked.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHANGES SUMMARY -->
+  <div class="section-title">What Changed & Why</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+    <div style="background:#0f0e1a;border:1px solid #1e1b3a;border-radius:12px;padding:14px">
+      <div style="font-size:18px;margin-bottom:6px">📅</div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:4px">Date Copy Fixed</div>
+      <div style="font-size:11px;color:#9ca3af">"Charged on" → "Group renews on". Eliminates 2028 bug confusion by showing what the date actually means.</div>
+    </div>
+    <div style="background:#0f0e1a;border:1px solid #1e1b3a;border-radius:12px;padding:14px">
+      <div style="font-size:18px;margin-bottom:6px">👥</div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:4px">Group Fill Visualised</div>
+      <div style="font-size:11px;color:#9ca3af">Visual fill bar + slots + estimated fill time. Converts "0/2 empty" anxiety into confidence.</div>
+    </div>
+    <div style="background:#0f0e1a;border:1px solid #1e1b3a;border-radius:12px;padding:14px">
+      <div style="font-size:18px;margin-bottom:6px">💡</div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:4px">Pro-Rata Explained</div>
+      <div style="font-size:11px;color:#9ca3af">First-month cost broken down by days. Eliminates the biggest pre-purchase uncertainty.</div>
+    </div>
+    <div style="background:#0f0e1a;border:1px solid #1e1b3a;border-radius:12px;padding:14px">
+      <div style="font-size:18px;margin-bottom:6px">🛡</div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:4px">Subspace Guarantee</div>
+      <div style="font-size:11px;color:#9ca3af">If group breaks → next month free. Beats WhatsApp+UPI on the one thing informal sharing can't offer: accountability.</div>
+    </div>
+  </div>
+</div>
+<footer>Subspace.money — Product Teardown · Proposed UI · Yash Vardhan Malik · 2026</footer>
+</body>
+</html>
