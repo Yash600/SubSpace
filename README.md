@@ -3,7 +3,7 @@
 ### Yash Vardhan Malik · Product Intern Assignment · May 2026
  
 🌐 **Live site:** https://yash600.github.io/SubSpace/
-📄 **Report:** [Download PDF](SUBSPA~2.pdf)
+📄 **Report:** [Download PDF](Subspace_Teardown_Yash.pdf)
 
 ---
 
